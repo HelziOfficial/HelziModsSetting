@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HelziModsSettings</title>
-<link rel="icon" href="logo.png">
+<title>HelziMods</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -44,10 +43,14 @@ header{
   padding:14px 0 38px;flex-wrap:wrap;
 }
 .brand{display:flex;align-items:center;gap:14px}
-.logo{
-  width:52px;height:52px;object-fit:contain;
-  filter:drop-shadow(0 0 10px rgba(0,230,230,.5));
+.brand-mark{
+  width:44px;height:44px;border-radius:12px;
+  display:grid;place-items:center;
+  background:linear-gradient(140deg,rgba(0,213,207,.22),rgba(0,168,137,.08));
+  border:1px solid var(--line2);
+  color:var(--cyan);
 }
+.brand-mark svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .brand h1{
   font-family:var(--font-sans);
   font-size:20px;margin:0;font-weight:800;letter-spacing:-.5px;
@@ -112,7 +115,7 @@ h2{
   border:1px solid var(--line2);
   color:var(--cyan);
 }
-.mod-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mod-icon svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mod-name{font-size:17px;font-weight:800;margin:0 0 5px;letter-spacing:-.2px}
 .mod-file{
   font-family:var(--font-mono);font-size:11.5px;color:var(--dim);
@@ -384,7 +387,6 @@ footer{
   border-top:1px solid var(--line);margin-top:64px;font-weight:500;
   letter-spacing:-.1px;
 }
-footer .logo-sm{width:22px;height:22px;vertical-align:middle;margin-right:8px;opacity:.7}
 
 @media(max-width:640px){
   .brand h1{font-size:18px}
@@ -401,7 +403,11 @@ footer .logo-sm{width:22px;height:22px;vertical-align:middle;margin-right:8px;op
 
   <header>
     <div class="brand">
-      <img class="logo" src="logo.png" alt="Helzi" onerror="this.style.display='none'">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+        </svg>
+      </div>
       <div>
         <h1>Helzi<span class="acc">Mods</span>Settings</h1>
         <small id="tagline">DAYZ CONFIG STUDIO</small>
@@ -478,7 +484,6 @@ footer .logo-sm{width:22px;height:22px;vertical-align:middle;margin-right:8px;op
   </section>
 
   <footer>
-    <img class="logo-sm" src="logo.png" alt="" onerror="this.style.display='none'">
     <span id="footerText">Всё работает локально — файлы не покидают ваш компьютер.</span>
   </footer>
 </div>
@@ -500,7 +505,6 @@ const T = {
     jsonLbl:'Предпросмотр JSON',
     footer:'Всё работает локально — файлы не покидают ваш компьютер.',
     resetOneFile:'Вернуть как было в файле',
-    resetOneSample:'Вернуть к примеру',
     remove:'Удалить', addBtn:'Добавить', emptyList:'Список пуст',
     adminsPh:'SteamID64 или имя',
     itemPh:'Classname предмета', addItemPh:'Добавить classname',
@@ -530,7 +534,6 @@ const T = {
     jsonLbl:'JSON preview',
     footer:'Everything runs locally — files never leave your computer.',
     resetOneFile:'Restore value from file',
-    resetOneSample:'Reset to sample',
     remove:'Remove', addBtn:'Add', emptyList:'List is empty',
     adminsPh:'SteamID64 or name',
     itemPh:'Item classname', addItemPh:'Add classname',
@@ -549,10 +552,34 @@ const T = {
   }
 };
 
+/* Иконки:
+   - AdvancedRecovery — гаечный ключ (repair)
+   - Filter (TrashCan) — мусорная корзина
+   - VehicleFinder — машина
+*/
+const ICONS = {
+  wrench: `
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+  `,
+  trash: `
+    <path d="M3 6h18"/>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+    <line x1="10" y1="11" x2="10" y2="17"/>
+    <line x1="14" y1="11" x2="14" y2="17"/>
+  `,
+  car: `
+    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+    <circle cx="7" cy="17" r="2"/>
+    <path d="M9 17h6"/>
+    <circle cx="17" cy="17" r="2"/>
+  `
+};
+
 const SCHEMAS = {
   AdvancedRecovery:{
     name:'AdvancedRecovery', file:'Setting.json', path:'advancedrecovery/setting.json',
-    icon:'<path d="M14.7 6.3a4 4 0 1 0 5 5L20 21 3 4l9.7-1z"/><circle cx="9" cy="9" r="2"/>',
+    icon: ICONS.wrench,
     fields:[
       { key:'mode', type:'radio', label:{ru:'Режим предметов',en:'Item mode'}, opts:[
         { v:0, label:{ru:'0 — Не чинить перечисленные',en:'0 — Do not repair listed items'} },
@@ -568,7 +595,7 @@ const SCHEMAS = {
   },
   Filter:{
     name:'TrashCan', file:'TrashFilter.json', path:'trashcan/trashfilter.json',
-    icon:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+    icon: ICONS.trash,
     fields:[
       { key:'ProtectedItems', type:'list', label:{ru:'Защищённые classname',en:'Protected classnames'}, wide:true }
     ],
@@ -576,7 +603,7 @@ const SCHEMAS = {
   },
   VehicleFinder:{
     name:'VehicleFinder', file:'Config.json', path:'vehiclefinder/config.json',
-    icon:'<path d="M5 17h14M5 17a2 2 0 1 0 0 .01M19 17a2 2 0 1 0 0 .01M3 11l2-6h14l2 6v6H3z"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/>',
+    icon: ICONS.car,
     fields:[
       { key:'Admins', type:'list', label:{ru:'Администраторы',en:'Admins'}, wide:true },
       { key:'MaxVehiclesPerPlayer', type:'number', label:{ru:'Макс. транспорта на игрока',en:'Max vehicles per player'}, min:0 },
