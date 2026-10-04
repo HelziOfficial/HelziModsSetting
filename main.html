@@ -43,26 +43,14 @@ header{
   padding:14px 0 38px;flex-wrap:wrap;
 }
 .brand{display:flex;align-items:center;gap:14px}
-.brand-mark{
-  width:44px;height:44px;border-radius:12px;
-  display:grid;place-items:center;
-  background:linear-gradient(140deg,rgba(0,213,207,.22),rgba(0,168,137,.08));
-  border:1px solid var(--line2);
-  color:var(--cyan);
-}
-.brand-mark svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .brand h1{
   font-family:var(--font-sans);
-  font-size:20px;margin:0;font-weight:800;letter-spacing:-.5px;
+  font-size:22px;margin:0;font-weight:800;letter-spacing:-.6px;
   color:#e8ffff;
-}
-.brand h1 .acc{
-  background:linear-gradient(120deg,#7ef0ca,#00e6e6);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .brand small{
   color:var(--dim);font-size:10px;letter-spacing:3px;font-weight:700;
-  text-transform:uppercase;display:block;margin-top:2px;
+  text-transform:uppercase;display:block;margin-top:3px;
 }
 .lang{
   display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:12px;
@@ -156,13 +144,16 @@ h2{
   font-family:var(--font-mono);font-size:12.5px;color:var(--green);font-weight:500;
 }
 
-/* EDITOR */
+/* EDITOR HEAD — всегда на одном и том же месте */
 .editor-head{
-  display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
-  flex-wrap:wrap;margin-bottom:18px;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  flex-wrap:wrap;margin-bottom:18px;min-height:52px;
 }
-.editor-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.editor-title h2{margin:0}
+.editor-title{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  flex:1 1 auto;min-width:0;
+}
+.editor-title h2{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* PILL + MODIFIED INDICATOR */
 .pill-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -185,7 +176,10 @@ h2{
 }
 .change-badge svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
 
-.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions{
+  display:flex;gap:10px;flex-wrap:wrap;
+  flex:0 0 auto;flex-shrink:0;
+}
 
 button.btn{
   font-family:var(--font-sans);font-size:14px;font-weight:600;letter-spacing:-.1px;
@@ -193,6 +187,7 @@ button.btn{
   padding:11px 18px;border-radius:12px;cursor:pointer;
   display:inline-flex;align-items:center;gap:8px;
   transition:border-color .15s,transform .15s,background .15s,box-shadow .15s;
+  white-space:nowrap;
 }
 button.btn:hover{border-color:var(--cyan);background:#123838}
 button.btn:active{transform:translateY(1px)}
@@ -388,11 +383,15 @@ footer{
   letter-spacing:-.1px;
 }
 
-@media(max-width:640px){
-  .brand h1{font-size:18px}
-  .mods{grid-template-columns:1fr}
-  .editor-head{flex-direction:column;align-items:stretch}
+@media(max-width:900px){
+  .editor-head{flex-direction:column;align-items:stretch;gap:12px}
+  .editor-title{flex:1 1 auto}
+  .actions{justify-content:stretch;flex-wrap:wrap}
   .actions button{flex:1;justify-content:center}
+}
+@media(max-width:640px){
+  .brand h1{font-size:19px}
+  .mods{grid-template-columns:1fr}
   .toasts{left:16px;right:16px;bottom:16px}
   .toast{max-width:none}
 }
@@ -403,13 +402,8 @@ footer{
 
   <header>
     <div class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24">
-          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-        </svg>
-      </div>
       <div>
-        <h1>Helzi<span class="acc">Mods</span>Settings</h1>
+        <h1>HelziModsSettings</h1>
         <small id="tagline">DAYZ CONFIG STUDIO</small>
       </div>
     </div>
@@ -552,11 +546,6 @@ const T = {
   }
 };
 
-/* Иконки:
-   - AdvancedRecovery — гаечный ключ (repair)
-   - Filter (TrashCan) — мусорная корзина
-   - VehicleFinder — машина
-*/
 const ICONS = {
   wrench: `
     <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
