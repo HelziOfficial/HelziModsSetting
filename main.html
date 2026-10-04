@@ -472,12 +472,8 @@ footer .logo-sm{width:22px;height:22px;vertical-align:middle;margin-right:8px;op
     <div class="json-wrap">
       <div class="json-head">
         <h3 id="jsonLbl">Предпросмотр JSON</h3>
-        <button class="btn ghost" onclick="applyJson()" style="padding:8px 14px;font-size:13px">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span id="btnApplyJson">Применить JSON</span>
-        </button>
       </div>
-      <textarea class="json" id="rawJson" spellcheck="false"></textarea>
+      <textarea class="json" id="rawJson" spellcheck="false" readonly></textarea>
     </div>
   </section>
 
@@ -501,26 +497,23 @@ const T = {
     step3:'Шаг 3 · Настройте и скачайте',
     editorTitle:'Настройки',
     btnRestore:'Как в файле', btnResetSample:'Сбросить к примеру', btnDownload:'Скачать JSON',
-    jsonLbl:'Предпросмотр JSON', btnApplyJson:'Применить JSON',
+    jsonLbl:'Предпросмотр JSON',
     footer:'Всё работает локально — файлы не покидают ваш компьютер.',
     resetOneFile:'Вернуть как было в файле',
     resetOneSample:'Вернуть к примеру',
     remove:'Удалить', addBtn:'Добавить', emptyList:'Список пуст',
-    adminsPh:'SteamID64 (17 цифр)', itemPh:'Classname предмета', addItemPh:'Добавить classname',
-    invalidSteam:'SteamID64 должен содержать ровно 17 цифр',
+    adminsPh:'SteamID64 или имя',
+    itemPh:'Classname предмета', addItemPh:'Добавить classname',
     invalidDup:'Такое значение уже есть в списке',
     invalidEmpty:'Значение не может быть пустым',
-    applied:'JSON применён к форме',
     restoredFile:'Восстановлено из загруженного файла',
     restoredSample:'Сброшено к встроенному примеру',
     restoredFieldFile:'Поле «{0}» возвращено как в файле',
-    restoredFieldSample:'Поле «{0}» возвращено к примеру',
     loaded:'JSON загружен', loadErr:'Ошибка чтения файла: ',
     jsonErr:'Ошибка в JSON: ', downloaded:'Файл сохранён',
     notObj:'Ожидался JSON-объект',
     resetSampleConfirm:'Сбросить все настройки к встроенному примеру? Твои изменения из файла будут потеряны.',
-    modified:'изменено', modifiedCount:'изменено полей: {0}',
-    noFileYet:'(шаблон)',
+    modified:'изменено',
     modInfo:{AdvancedRecovery:'Ремонт предметов', Filter:'Мусорка / фильтр', VehicleFinder:'Поиск транспорта'},
     badge:['изменено: ','изменено: {0} поля(ей)']
   },
@@ -534,26 +527,23 @@ const T = {
     step3:'Step 3 · Tune and download',
     editorTitle:'Settings',
     btnRestore:'Restore from file', btnResetSample:'Reset to sample', btnDownload:'Download JSON',
-    jsonLbl:'JSON preview', btnApplyJson:'Apply JSON',
+    jsonLbl:'JSON preview',
     footer:'Everything runs locally — files never leave your computer.',
     resetOneFile:'Restore value from file',
     resetOneSample:'Reset to sample',
     remove:'Remove', addBtn:'Add', emptyList:'List is empty',
-    adminsPh:'SteamID64 (17 digits)', itemPh:'Item classname', addItemPh:'Add classname',
-    invalidSteam:'SteamID64 must be exactly 17 digits',
+    adminsPh:'SteamID64 or name',
+    itemPh:'Item classname', addItemPh:'Add classname',
     invalidDup:'This value is already in the list',
     invalidEmpty:'Value cannot be empty',
-    applied:'JSON applied to the form',
     restoredFile:'Restored from uploaded file',
     restoredSample:'Reset to built-in sample',
     restoredFieldFile:'Field "{0}" restored from file',
-    restoredFieldSample:'Field "{0}" reset to sample',
     loaded:'JSON loaded', loadErr:'Failed to read file: ',
     jsonErr:'JSON error: ', downloaded:'File saved',
     notObj:'A JSON object was expected',
     resetSampleConfirm:'Reset all settings to the built-in sample? Your file changes will be lost.',
-    modified:'modified', modifiedCount:'modified fields: {0}',
-    noFileYet:'(template)',
+    modified:'modified',
     modInfo:{AdvancedRecovery:'Item recovery', Filter:'Trash can / filter', VehicleFinder:'Vehicle finder'},
     badge:['modified: ','modified: {0} field(s)']
   }
@@ -588,7 +578,7 @@ const SCHEMAS = {
     name:'VehicleFinder', file:'Config.json', path:'vehiclefinder/config.json',
     icon:'<path d="M5 17h14M5 17a2 2 0 1 0 0 .01M19 17a2 2 0 1 0 0 .01M3 11l2-6h14l2 6v6H3z"/><circle cx="7" cy="14" r="1"/><circle cx="17" cy="14" r="1"/>',
     fields:[
-      { key:'Admins', type:'list', label:{ru:'Администраторы (SteamID64)',en:'Admins (SteamID64)'}, admins:true, wide:true },
+      { key:'Admins', type:'list', label:{ru:'Администраторы',en:'Admins'}, wide:true },
       { key:'MaxVehiclesPerPlayer', type:'number', label:{ru:'Макс. транспорта на игрока',en:'Max vehicles per player'}, min:0 },
       { key:'SearchCooldownSeconds', type:'number', label:{ru:'Задержка поиска (сек)',en:'Search cooldown (sec)'}, min:0 },
       { key:'MarkerDurationSeconds', type:'number', label:{ru:'Время маркера (сек)',en:'Marker duration (sec)'}, min:0 },
@@ -602,7 +592,6 @@ const SCHEMAS = {
 let lang = 'ru';
 let mod  = 'AdvancedRecovery';
 let data = structuredClone(SCHEMAS[mod].defaults);
-// baseline[mod] — данные, которые были загружены из файла (или дефолты, если файл не загружался)
 let baselines = {};
 let fileNames = {};
 const $ = id => document.getElementById(id);
@@ -639,7 +628,6 @@ function applyLang(){
   $('btnResetSampleLbl').textContent = t.btnResetSample;
   $('btnDownload').textContent = t.btnDownload;
   $('jsonLbl').textContent = t.jsonLbl;
-  $('btnApplyJson').textContent = t.btnApplyJson;
   $('footerText').textContent = t.footer;
   updateChangedIndicator();
 }
@@ -670,12 +658,12 @@ function renderMods(){
 
 function isModifiedFor(m){
   if (!baselines[m]) return false;
-  return JSON.stringify(SCHEMAS[m] && (m===mod ? data : (window.__dataCache?.[m] || baselines[m]))) !== JSON.stringify(baselines[m]);
+  const current = (m === mod) ? data : (window.__dataCache?.[m] || baselines[m]);
+  return JSON.stringify(current) !== JSON.stringify(baselines[m]);
 }
 
 function selectMod(key){
   if (key === mod) return;
-  // Сохраняем текущее состояние в кэш
   if (!window.__dataCache) window.__dataCache = {};
   window.__dataCache[mod] = structuredClone(data);
 
@@ -718,11 +706,9 @@ function handleFile(file){
       const parsed = JSON.parse(String(reader.result).replace(/^\uFEFF/,''));
       if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error(T[lang].notObj);
 
-      // Мержим поверх дефолтов
       const base = structuredClone(SCHEMAS[mod].defaults);
       for (const [k,v] of Object.entries(parsed)) base[k] = v;
 
-      // Обновляем baseline и данные
       baselines[mod] = structuredClone(base);
       fileNames[mod] = file.name;
       data = structuredClone(base);
@@ -891,13 +877,11 @@ function buildList(field, arr){
   const inp = document.createElement('input');
   inp.className = 'input';
   inp.placeholder = field.admins ? T[lang].adminsPh : T[lang].addItemPh;
-  if (field.admins) inp.inputMode = 'numeric';
   const btn = document.createElement('button');
   btn.textContent = T[lang].addBtn;
   btn.onclick = ()=>{
     const s = inp.value.trim();
     if (!s){ toast('err', T[lang].invalidEmpty); return; }
-    if (field.admins && !/^\d{17}$/.test(s)){ toast('err', T[lang].invalidSteam); return; }
     if (arr.map(String).includes(s)){ toast('err', T[lang].invalidDup); return; }
     arr.push(s);
     data[field.key] = arr;
@@ -918,11 +902,9 @@ function buildListRow(field, arr, i){
   inp.className = 'input';
   inp.value = String(arr[i]);
   inp.placeholder = field.admins ? T[lang].adminsPh : T[lang].itemPh;
-  if (field.admins) inp.inputMode = 'numeric';
   inp.onchange = ()=>{
     const s = inp.value.trim();
     if (!s){ toast('err', T[lang].invalidEmpty); inp.value = arr[i]; return; }
-    if (field.admins && !/^\d{17}$/.test(s)){ toast('err', T[lang].invalidSteam); inp.value = arr[i]; return; }
     if (arr.some((x,j)=> j!==i && String(x)===s)){ toast('err', T[lang].invalidDup); inp.value = arr[i]; return; }
     arr[i] = s;
     data[field.key] = arr;
@@ -977,7 +959,6 @@ function updateChangedIndicator(){
     const tpl = T[lang].badge[n===1?0:1];
     badgeText.textContent = n===1 ? tpl : tpl.replace('{0}', n);
   }
-  // Обновим кэш
   if (!window.__dataCache) window.__dataCache = {};
   window.__dataCache[mod] = structuredClone(data);
 }
@@ -995,7 +976,6 @@ function restoreFile(){
 function resetToSample(){
   if (!confirm(T[lang].resetSampleConfirm)) return;
   data = structuredClone(SCHEMAS[mod].defaults);
-  // baseline тоже обнуляем — теперь «как в файле» = встроенный пример
   baselines[mod] = structuredClone(SCHEMAS[mod].defaults);
   fileNames[mod] = null;
   $('uploadInfo').style.display = 'none';
@@ -1028,20 +1008,6 @@ function updateJson(){
   updateChangedIndicator();
 }
 
-function applyJson(){
-  try{
-    const parsed = JSON.parse($('rawJson').value.replace(/^\uFEFF/,''));
-    if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error(T[lang].notObj);
-    data = parsed;
-    if (!window.__dataCache) window.__dataCache = {};
-    window.__dataCache[mod] = structuredClone(data);
-    renderEditor();
-    toast('ok', T[lang].applied);
-  }catch(e){
-    toast('err', T[lang].jsonErr + e.message);
-  }
-}
-
 function download(){
   try{
     const content = JSON.stringify(data, null, 2) + '\n';
@@ -1051,7 +1017,6 @@ function download(){
     a.download = fileNames[mod] || SCHEMAS[mod].file;
     a.click();
     setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
-    // после скачивания — сохраняем как новый baseline
     baselines[mod] = structuredClone(data);
     renderEditor();
     renderMods();
