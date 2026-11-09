@@ -119,6 +119,31 @@ h2{
 }
 .mod-badge::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--amber)}
 
+/* EXTERNAL MOD CARD */
+.mod.external{
+  background:linear-gradient(140deg,rgba(0,213,207,.12),rgba(0,168,137,.06));
+  border-color:var(--line2);
+}
+.mod.external .mod-file{
+  color:var(--cyan);
+  font-family:var(--font-sans);
+  font-weight:600;
+}
+.mod-external-icon{
+  position:absolute;top:14px;right:14px;width:18px;height:18px;
+  color:var(--dim);
+  transition:color .15s,transform .15s;
+}
+.mod-external-icon svg{
+  width:100%;height:100%;
+  stroke:currentColor;fill:none;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
+.mod.external:hover .mod-external-icon{
+  color:var(--cyan);
+  transform:translate(1px,-1px);
+}
+
 /* UPLOAD */
 .upload{
   border:2px dashed var(--line2);border-radius:var(--radius);
@@ -144,7 +169,7 @@ h2{
   font-family:var(--font-mono);font-size:12.5px;color:var(--green);font-weight:500;
 }
 
-/* EDITOR HEAD — всегда на одном и том же месте */
+/* EDITOR HEAD */
 .editor-head{
   display:flex;justify-content:space-between;align-items:center;gap:16px;
   flex-wrap:wrap;margin-bottom:18px;min-height:52px;
@@ -485,6 +510,11 @@ footer{
 <div class="toasts" id="toasts"></div>
 
 <script>
+/* ==================== ВНЕШНИЕ ССЫЛКИ ==================== */
+// ⚠️ Замените на реальную ссылку Cassette Tools (Studio)
+const CASSETTE_TOOLS_URL = 'https://example.com/cassette-tools-studio';
+/* ======================================================= */
+
 const T = {
   ru:{
     tagline:'DAYZ CONFIG STUDIO',
@@ -512,6 +542,7 @@ const T = {
     notObj:'Ожидался JSON-объект',
     resetSampleConfirm:'Сбросить все настройки к встроенному примеру? Твои изменения из файла будут потеряны.',
     modified:'изменено',
+    openExternal:'Открыть в новой вкладке',
     modInfo:{AdvancedRecovery:'Ремонт предметов', Filter:'Мусорка / фильтр', VehicleFinder:'Поиск транспорта'},
     badge:['изменено: ','изменено: {0} поля(ей)']
   },
@@ -541,6 +572,7 @@ const T = {
     notObj:'A JSON object was expected',
     resetSampleConfirm:'Reset all settings to the built-in sample? Your file changes will be lost.',
     modified:'modified',
+    openExternal:'Open in new tab',
     modInfo:{AdvancedRecovery:'Item recovery', Filter:'Trash can / filter', VehicleFinder:'Vehicle finder'},
     badge:['modified: ','modified: {0} field(s)']
   }
@@ -562,6 +594,17 @@ const ICONS = {
     <circle cx="7" cy="17" r="2"/>
     <path d="M9 17h6"/>
     <circle cx="17" cy="17" r="2"/>
+  `,
+  cassette: `
+    <rect x="2" y="6" width="20" height="12" rx="2"/>
+    <circle cx="7" cy="12" r="2"/>
+    <circle cx="17" cy="12" r="2"/>
+    <line x1="9" y1="12" x2="15" y2="12"/>
+  `,
+  external: `
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+    <polyline points="15 3 21 3 21 9"/>
+    <line x1="10" y1="14" x2="21" y2="3"/>
   `
 };
 
@@ -602,6 +645,13 @@ const SCHEMAS = {
       { key:'LogAdminActions', type:'switch', label:{ru:'Логировать действия админов',en:'Log admin actions'} }
     ],
     defaults:{ Admins:[], MaxVehiclesPerPlayer:10, SearchCooldownSeconds:15, MarkerDurationSeconds:300, EnableAdminPanel:1, LogAdminActions:1 }
+  },
+  CassetteTools:{
+    name:'Cassette Tools (Studio)',
+    file:'studio',
+    external:true,
+    url: CASSETTE_TOOLS_URL,
+    icon: ICONS.cassette
   }
 };
 
@@ -655,8 +705,23 @@ function renderMods(){
   for (const key of Object.keys(SCHEMAS)){
     const s = SCHEMAS[key];
     const el = document.createElement('button');
-    el.className = 'mod' + (key===mod ? ' active' : '');
     el.dataset.mod = key;
+
+    // Внешний инструмент — открывает ссылку в новой вкладке
+    if (s.external){
+      el.className = 'mod external';
+      el.innerHTML = `
+        <div class="mod-icon"><svg viewBox="0 0 24 24">${s.icon}</svg></div>
+        <div class="mod-name">${s.name}</div>
+        <div class="mod-file">${T[lang].openExternal} →</div>
+        <div class="mod-external-icon"><svg viewBox="0 0 24 24">${ICONS.external}</svg></div>
+      `;
+      el.onclick = ()=> window.open(s.url, '_blank', 'noopener');
+      box.append(el);
+      continue;
+    }
+
+    el.className = 'mod' + (key===mod ? ' active' : '');
 
     const hasUnsaved = isModifiedFor(key);
     const badge = hasUnsaved ? `<div class="mod-badge">${lang==='ru'?'не сохранено':'unsaved'}</div>` : '';
@@ -680,6 +745,7 @@ function isModifiedFor(m){
 
 function selectMod(key){
   if (key === mod) return;
+  if (SCHEMAS[key].external) return;
   if (!window.__dataCache) window.__dataCache = {};
   window.__dataCache[mod] = structuredClone(data);
 
@@ -690,7 +756,7 @@ function selectMod(key){
   renderMods();
   renderEditor();
   updateChangedIndicator();
-  toast('info', SCHEMAS[mod].name + ' · ' + T[lang].modInfo[mod]);
+  toast('info', SCHEMAS[mod].name + ' · ' + (T[lang].modInfo[mod] || ''));
 }
 
 /* ============ UPLOAD ============ */
@@ -750,6 +816,7 @@ function handleFile(file){
 /* ============ EDITOR ============ */
 function renderEditor(){
   const s = SCHEMAS[mod];
+  if (s.external) return;
   $('editorTitle').textContent = T[lang].editorTitle + ' · ' + s.name;
   $('fileNamePill').textContent = fileNames[mod] || s.file;
 
@@ -953,6 +1020,7 @@ function flashField(key){
 function countChangedFields(){
   const base = getBaseline(mod);
   const s = SCHEMAS[mod];
+  if (s.external || !s.fields) return 0;
   let n = 0;
   for (const f of s.fields){
     if (JSON.stringify(data[f.key]) !== JSON.stringify(base[f.key])) n++;
